@@ -11,6 +11,7 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
@@ -43,14 +44,14 @@ private int seekBackwardTime = 5000; // 5000 milliseconds
 private int currentSongIndex = 0;
 private boolean isShuffle = false;
 private boolean isRepeat = false;
-private ArrayList<HashMap<String, String>> songsList = new ArrayList<HashMap<String, String>>();
+private ArrayList<HashMap<String, String>> songsList;
 
 
 @Override
 public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_player);
-
+        Log.d("xxx","masuk");
         // All player buttons
         btnPlay = (ImageButton) findViewById(R.id.btnPlay);
         btnForward = (ImageButton) findViewById(R.id.btnForward);
@@ -75,7 +76,21 @@ public void onCreate(Bundle savedInstanceState) {
         mp.setOnCompletionListener(this); // Important
 
         // Getting all songs list
-        songsList = songManager.getPlayList();
+
+        ArrayList<HashMap<String,String>> songList = songManager.getPlayList("/storage/sdcard/");
+        if(songList!=null){
+                for(int i=0;i<songList.size();i++){
+                        String fileName=songList.get(i).get("file_name");
+                        String filePath=songList.get(i).get("file_path");
+                        //here you will get list of file name and file path that present in your device
+                        Log.e("file details "," name ="+fileName +" path = "+filePath);
+                }
+        }
+
+
+//        songsList = songManager.getPlayList();
+        Log.d("xxx", String.valueOf(songsList.size()));
+
 
         // By default play first song
         playSong(0);
@@ -278,30 +293,30 @@ protected void onActivityResult(int requestCode,
 public void  playSong(int songIndex){
         // Play song
         try {
-        mp.reset();
-        mp.setDataSource(songsList.get(songIndex).get("songPath"));
-        mp.prepare();
-        mp.start();
-        // Displaying Song title
-        String songTitle = songsList.get(songIndex).get("songTitle");
-        songTitleLabel.setText(songTitle);
+                mp.reset();
+                mp.setDataSource(songsList.get(songIndex).get("songPath"));
+                mp.prepare();
+                mp.start();
+                // Displaying Song title
+                String songTitle = songsList.get(songIndex).get("songTitle");
+                songTitleLabel.setText(songTitle);
 
-        // Changing Button Image to pause image
-        btnPlay.setImageResource(R.drawable.btn_pause);
+                // Changing Button Image to pause image
+                btnPlay.setImageResource(R.drawable.btn_pause);
 
-        // set Progress bar values
-        songProgressBar.setProgress(0);
-        songProgressBar.setMax(100);
+                // set Progress bar values
+                songProgressBar.setProgress(0);
+                songProgressBar.setMax(100);
 
-        // Updating progress bar
-        updateProgressBar();
-        } catch (IllegalArgumentException e) {
-        e.printStackTrace();
-        } catch (IllegalStateException e) {
-        e.printStackTrace();
-        } catch (IOException e) {
-        e.printStackTrace();
-        }
+                // Updating progress bar
+                updateProgressBar();
+                } catch (IllegalArgumentException e) {
+                        e.printStackTrace();
+                } catch (IllegalStateException e) {
+                        e.printStackTrace();
+                } catch (IOException e) {
+                        e.printStackTrace();
+                }
         }
 
 /**
